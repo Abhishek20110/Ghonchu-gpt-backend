@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Test AI Models API</title>
+</head>
+
+<body>
+    <h1>Call AI GET API</h1>
+    <button onclick="callApi()">Call API</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function callApi() {
+            try {
+                const response = await fetch("http://localhost:8080/api/ai/admin/translate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                        // Origin will be automatically added by browser
+                    },
+                    body: JSON.stringify({
+                        test: "who are you?",
+                        baselanguage: "en",
+                        targetlanguage: "bengali"
+                    })
+                });
+
+                const data = await response.json();
+                document.getElementById("result").innerText = JSON.stringify(data, null, 2);
+            } catch (err) {
+                document.getElementById("result").innerText = `Error: ${err.message}`;
+            }
+        }
+    </script>
+</body>
+
+</html>

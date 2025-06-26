@@ -1,9 +1,41 @@
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_APPKEY_API });
+//const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_APPKEY_API });
+
+const getGoogleGenAIInstance = (req) => {
+    const origin = req.headers.origin || req.headers.referer || "";
+
+    const allowedDomain = process.env.ALLOWED_DOMAIN;
+
+    // Basic domain match check
+    const isFromAllowedDomain = origin.includes(allowedDomain);
+
+    const apiKey = isFromAllowedDomain
+        ? process.env.GOOGLE_APPKEY_API2
+        : process.env.GOOGLE_APPKEY_API;
+
+
+
+
+    return new GoogleGenAI({ apiKey });
+
+};
+
+export const getAIModels = async (req, res) => {
+    const ai = getGoogleGenAIInstance(req);
+    try {
+        res.status(200).json({
+            success: true,
+        });
+    }
+    catch (error) {
+        console.error("Error in getAIModels:", error);
+        res.status(500).json({ message: "Internal server error", error: error.message });
+    }
+};
 
 export const summarizeText = async (req, res) => {
-
+    const ai = getGoogleGenAIInstance(req);
     try {
         const { text } = req.body;
 
@@ -30,6 +62,7 @@ export const summarizeText = async (req, res) => {
 };
 
 export const generateText = async (req, res) => {
+    const ai = getGoogleGenAIInstance(req);
     try {
         const { prompt } = req.body;
 
@@ -52,6 +85,7 @@ export const generateText = async (req, res) => {
 };
 
 export const rewriteText = async (req, res) => {
+    const ai = getGoogleGenAIInstance(req);
     try {
         const { text } = req.body;
         if (!text) return res.status(400).json({ message: "Text is required" });
@@ -71,6 +105,7 @@ export const rewriteText = async (req, res) => {
 };
 
 export const translateText = async (req, res) => {
+    const ai = getGoogleGenAIInstance(req);
     try {
         const { test, baselanguage, targetlanguage } = req.body;
         if (!test || !baselanguage || !targetlanguage) {
